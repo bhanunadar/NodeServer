@@ -1,0 +1,16 @@
+version: "2"
+services:
+  mongo:
+    image: mongo:3.6.3
+    volumes:
+      - /data:/data/db
+    ports:
+      - "27017:27017"
+  web:
+    build: .
+    volumes:
+      - .:/src
+    ports:
+      - "8080:3000"
+      - "9229:9229"
+      
