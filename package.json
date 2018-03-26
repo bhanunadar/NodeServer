@@ -5,13 +5,17 @@
   "main": "server.js",
   "dependencies": {
     "bcrypt": "^1.0.3",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "express": "^4.16.2",
+    "install": "^0.10.4",
     "mongodb": "^3.0.4",
     "mongodb-autoincrement": "^1.0.1",
     "mongoose": "^5.0.10",
-    "nodemon": "^1.17.2"
+    "node-gyp": "^3.6.2",
+    "nodemon": "^1.17.2",
+    "rebuild": "^0.1.2"
   },
   "devDependencies": {},
   "scripts": {

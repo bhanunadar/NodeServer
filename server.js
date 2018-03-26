@@ -2,9 +2,9 @@ const express = require('express');
 const mongodb = require('mongodb');
 const bodyParser = require("body-parser");
 var app = express();
-
+app.use(bodyParser.json());
 ObjectId = require('mongodb').ObjectID;
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt-nodejs');
 const saltRounds = 10;
 var cors = require("cors");
 app.use(cors());
@@ -25,8 +25,6 @@ app.get("/", function (req, res) {
 /**********************************sign up******************/
 app.post("/signup", function (req, res) {
 	
-	console.log(req.body.params);
-	console.log(req.query);
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			console.log("db not connected");
@@ -39,7 +37,6 @@ app.post("/signup", function (req, res) {
 		else {
 			var dbo = db.db("mydb");
 			var query = { email: req.query.email };
-			console.log(req);
 			dbo.collection("users").findOne(query, function (err, resu) {
 				if (err) {
 					console.log(err);
@@ -50,33 +47,44 @@ app.post("/signup", function (req, res) {
 					res.send(failure);
 				}
 				if (resu == null) {
-					
-					var hash = bcrypt.hashSync(req.query.password, saltRounds);
-					var user = {
-						name: req.query.name,
-						email: req.query.email,
-						phonenumber: req.query.phonenumber,
-						address: req.query.address,
-						password: hash,
-					}
-
-					dbo.collection("users").insertOne(user, function (err, res) {
-						if (err) {
-							console.log(err);
-							var failure={
-								status:"failure",
-								message:err,
-							}
-							res.send(failure);
+					console.log("Adding");
+					console.log(req);
+					var hashP,user ;
+					bcrypt.hash(req.query.password, null, null, function(err, hash) {
+						// Store hash in your password DB.
+						if(err)
+						console.log(err);
+						hashP=hash;
+						console.log(hash);
+						user = {
+							name: req.query.name,
+							email: req.query.email,
+							phonenumber: req.query.phonenumber,
+							address: req.query.address,
+							password: hashP,
 						}
-						else {
-							console.log("user added");
-							var success={
-								status:"success",
-
+						console.log(user);
+						dbo.collection("users").insertOne(user, function (err, result) {
+							if (err) {
+								console.log(err);
+								var failure={
+									status:"failure",
+									message:err,
+								}
+								res.send(failure);
 							}
-						}
+							else {
+								console.log("user added");
+								var success={
+									status:"success",
+									messgae:"New User Added",
+								}
+	
+								res.send(success);
+							}
+						});
 					});
+					
 				}
 				else {
 					var failure={
@@ -96,26 +104,51 @@ app.post("/auth", function (req, res) {
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			console.log("Unable to connect", err);
-			return 7624;
+			var failure={
+				status:"failure",
+				message:err,
+			}
+			res.send(failure);
 		}
 		else {
 			console.log("Connection established");
 			var dbo = db.db("mydb");
-			var query = { username: req.query.email };
+			var query = { email: req.query.email };
 			dbo.collection("users").findOne(query, function (err, resu) {
-				if (err)
-					return 7655;
+				if (err){
+					var failure={
+						status:"failure",
+						message:err,
+					}
+					res.send(failure);
+				}
 				else {
 					if (resu == null) {
-						return 7656;
+						var failure={
+							status:"failure",
+							message:"No User Found",
+						}
+						res.send(failure);
 					}
 					else {
 						var hash = resu.password;
-						var ans = bcrypt.compareSync(myPlaintextPassword, hash);
+						var ans = bcrypt.compareSync(req.query.password, hash);
 						if (ans)
-							return 7653;
+							{
+								var success={
+									status:"success",
+									message:"Succesfully Loged In"
+								}
+								res.send(success);
+							}
 						else
-							7655;
+							{
+								var failure={
+									status:"failure",
+									message:"Password is Incorrect",
+								}
+								res.send(failure)
+							}
 					}
 				}
 			});
@@ -126,7 +159,11 @@ app.post("/admin/price_table", function (req, res) {
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			console.log(err);
-			return 7624;
+			var failure={
+				status:"failure",
+				message:err,
+			}
+			res.send(failure);
 		}
 		else {
 			var dbo = db.db("mydb");
@@ -144,10 +181,21 @@ app.post("/admin/price_table", function (req, res) {
 			console.log("created object at price_table");
 			dbo.collection("price_table").insertOne(object, function (err, resu) {
 				if (err)
-					return 7655;
-
-				console.log(resu);
-				return 7653;
+				{
+					var failure={
+						status:"failure",
+						message:err,
+					}
+					res.send(failure);
+				}
+				else
+				{
+					var success={
+						status:"success",
+						message:"Succesfully Added to Database"
+					}
+					res.send(success);
+				}
 			});
 		}
 	});
@@ -155,7 +203,13 @@ app.post("/admin/price_table", function (req, res) {
 app.get("/getChannels", function (req, res) {
 	mongoClient.connect(url, function (err, db) {
 		if (err)
-			return 7624;
+			{
+				var failure={
+					status:"failure",
+					message:err,
+				}
+				res.send(failure);
+			}
 		else {
 			var dbo = db.db("mydb");
 			var collection=dbo.collection("price_table");
@@ -164,6 +218,11 @@ app.get("/getChannels", function (req, res) {
 				if (err) {
 					// console.log(err);
 					console.log("err");
+					var failure={
+						status:"failure",
+						message:err,
+					}
+					res.send(failure);
 				}
 
 				else {
@@ -177,14 +236,24 @@ app.get("/getChannels", function (req, res) {
 app.post("/billing_record", function (req, res) {
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
-			console.log("Unable to connect", err);
+			var failure={
+				status:"failure",
+				message:err,
+			}
+			res.send(failure);
 		}
 		else {
 			console.log("Connection established");
 			var dbo = db.db("mydb");
 			autoIncrement.getNextSequence(dbo, "billing_record", function (err, autoIndex) {
 				if (err)
-					console.log("fail to add bill");
+					{
+						var failure={
+							status:"failure",
+							message:"Failed to Add",
+						}
+						res.send(failure);
+					}
 				else {
 					var collection = dbo.collection("billing_record");
 					collection.insert({
@@ -195,6 +264,11 @@ app.post("/billing_record", function (req, res) {
 						itemcode: req.query.itemcode,
 					});
 					console.log("Added");
+					var success={
+						status:"sucess",
+						message:"Succesfully Added to Database"
+					}
+					res.send(success);
 				}
 			});
 
