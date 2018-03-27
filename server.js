@@ -295,8 +295,32 @@ app.post("/addComment",function(req,res){
 			res.send(failure);
 		}
 		else {
-			
-
+			var Comment={
+				title:req.body.title,
+				rating:req.body.rating,
+				description:req.body.description,
+				user:req.body.email,
+			}
+			var dbo=db.db("mydb");
+			var collection=dbo.collection("price_table");
+			collection.update({ itemcode:req.body.itemcode }, { $push: { "comments": { Comment } } }, function (err, req) {
+				if(err)
+				{
+					var failure = {
+						status: "failure",
+						message: err,
+					}
+					res.send(failure);
+				}
+				else
+				{
+					var success = {
+						status: "success",
+						message: "Succesfully Added to Database"
+					}
+					res.send(success);
+				}
+			});
 		}
 	});
 });
@@ -312,6 +336,7 @@ app.post("/showDetails",function(req,res){
 		}
 		else {
 				var id=req.body.itemcode;
+				console.log(id);
 				var dbo=db.db("mydb");
 				dbo.collection("price_table").findOne({itemcode:id},function(err,resu){
 					if(err)
@@ -324,6 +349,7 @@ app.post("/showDetails",function(req,res){
 					}
 					else
 					{
+						console.log(resu);
 						res.send(resu);
 					}
 				});
