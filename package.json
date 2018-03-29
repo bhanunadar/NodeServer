@@ -11,10 +11,12 @@
     "cors": "^2.8.4",
     "express": "^4.16.2",
     "install": "^0.10.4",
+    "jsonwebtoken": "^8.2.0",
     "mongodb": "^3.0.4",
     "mongodb-autoincrement": "^1.0.1",
     "mongoose": "^5.0.10",
     "node-gyp": "^3.6.2",
+    "nodemailer": "^4.6.3",
     "nodemon": "^1.17.2",
     "rebuild": "^0.1.2"
   },
