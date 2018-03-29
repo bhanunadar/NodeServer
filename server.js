@@ -3,32 +3,28 @@ const mongodb = require('mongodb');
 const bodyParser = require("body-parser");
 const nodeMailer = require("nodemailer");
 var jwt = require('jsonwebtoken');
-
+var verifyToken=require("./verifyToken");
 var app = express();
 app.use(bodyParser.json());
 ObjectId = require('mongodb').ObjectID;
 app.use(express.static('resources'))
 var bcrypt = require('bcrypt-nodejs');
 const saltRounds = 10;
-var secret= "wearegoingtowinSIH";
+var secret = "wearegoingtowinSIH";
 var cors = require("cors");
 app.use(cors());
 var autoIncrement = require("mongodb-autoincrement");
 app.use(bodyParser.urlencoded({ extended: true }));
 var url = "mongodb://mongo:27017/";
 app.use(express.static("resources"));
+
 var mongoClient = mongodb.MongoClient;
 app.use(function (req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	next();
 });
-const clientSessions = require("client-sessions");
-app.use(clientSessions({
-	cookieName: 'session', // cookie name dictates the key name added to the request object // should be a large unguessable string
-	secret: '0GBlJZ9EKBt2Zbi2flRPvztczCewBxXK', // set this to a long random string!
-	duration: 7 * 24 * 60 * 60 * 1000
-}));
+
 app.get("/", function (req, res) {
 	res.send("hello1245");
 	console.log("requested");
@@ -47,7 +43,7 @@ app.post("/signup", function (req, res) {
 		}
 		else {
 			var dbo = db.db("mydb");
-			
+
 			var query = { email: req.body.email };
 			dbo.collection("users").findOne(query, function (err, resu) {
 				if (err) {
@@ -109,16 +105,15 @@ app.post("/signup", function (req, res) {
 			});
 
 		}
-		
+
 	});
 
 });
 
 /**************Authentication***************/
 app.post("/auth", function (req, res) {
+
 	
-	req.session.email = req.body.email;
-	req.session.loggedIn=true;
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			console.log("Unable to connect", err);
@@ -130,10 +125,11 @@ app.post("/auth", function (req, res) {
 			res.send(failure);
 		}
 		else {
-
+		
+			
 			console.log("Connection established");
 			var dbo = db.db("mydb");
-			
+
 			var query = { email: req.body.email };
 			dbo.collection("users").findOne(query, function (err, resu) {
 				if (err) {
@@ -162,11 +158,12 @@ app.post("/auth", function (req, res) {
 								message: "Succesfully Loged In"
 							}
 							console.log("succes");
-							var token = jwt.sign({ email:req.body.email }, secret, {
+							var token = jwt.sign({ id: req.body.email }, secret, {
 								expiresIn: 86400 // expires in 24 hours
-							  })
-							  console.log(token);
-							res.send(success);
+							  });
+						  
+							  res.status(200).send({ status:"success", auth: true, token: token });
+							
 						}
 						else {
 							var failure = {
@@ -186,7 +183,7 @@ app.post("/auth", function (req, res) {
 /*******************wish list ******************/
 app.post("/addToWishList", function (req, res) {
 	console.log(req);
-	console.log(req.session.email);
+	
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			console.log(err);
@@ -198,7 +195,7 @@ app.post("/addToWishList", function (req, res) {
 		}
 		else {
 			var dbo = db.db("mydb");
-			var user_email = req.session.email;
+			var user_email = req.body.email;
 
 			var collection = dbo.collection("users");
 			if (req.body.toAdd == true) {
@@ -247,8 +244,8 @@ app.post("/addToWishList", function (req, res) {
 
 
 /************ To Add Comment************* */
-app.post("/addComment",function(req,res){
-	mongoClient.connect(url,function(err,db){
+app.post("/addComment", function (req, res) {
+	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			var failure = {
 				status: "failure",
@@ -257,28 +254,26 @@ app.post("/addComment",function(req,res){
 			res.send(failure);
 		}
 		else {
-			var Comment={
-				title:req.body.title,
-				rating:req.body.rating,
-				description:req.body.description,
-				user:req.session.email,
+			var Comment = {
+				title: req.body.title,
+				rating: req.body.rating,
+				description: req.body.description,
+				user: req.body.email,
 			}
-			var dbo=db.db("mydb");
-			var collection=dbo.collection("price_table");
-			collection.update({ itemcode:req.body.itemcode }, { $push: { "comments": { Comment } } }, function (err, req) {
-				if(err)
-				{
+			var dbo = db.db("mydb");
+			var collection = dbo.collection("price_table");
+			collection.update({ itemcode: req.body.itemcode }, { $push: { "comments": { Comment } } }, function (err, req) {
+				if (err) {
 					var failure = {
 						status: "failure",
 						message: err,
 					}
 					res.send(failure);
 				}
-				else
-				{
+				else {
 					var success = {
 						status: "success",
-						message: "Succesfully Added to Database"
+						message: "Succesfully Added to Database",
 					}
 					res.send(success);
 				}
@@ -287,8 +282,9 @@ app.post("/addComment",function(req,res){
 	});
 });
 /***********************to Show The Full Detail of one item********** */
-app.post("/showDetails",function(req,res){
-	mongoClient.connect(url,function(err,db){
+app.post("/showDetails",verifyToken, function (req, res,next) {
+	console.log(req.itemcode);
+	  mongoClient.connect(url, function (err, db) {
 		if (err) {
 			var failure = {
 				status: "failure",
@@ -297,29 +293,27 @@ app.post("/showDetails",function(req,res){
 			res.send(failure);
 		}
 		else {
-				var id=req.body.itemcode;
-				console.log(id);
-				var dbo=db.db("mydb");
-				dbo.collection("price_table").findOne({itemcode:id},function(err,resu){
-					if(err)
-					{
-						var failure = {
-							status: "failure",
-							message: err,
-						}
-						res.send(failure);
+			var id = req.body.itemcode;
+			console.log(id);
+			var dbo = db.db("mydb");
+			dbo.collection("price_table").findOne({ itemcode: id }, function (err, resu) {
+				if (err) {
+					var failure = {
+						status: "failure",
+						message: err,
 					}
-					else
-					{
-						console.log(resu);
-						res.send(resu);
-					}
-				});
+					res.send(failure);
+				}
+				else {
+					console.log(resu);
+					res.send(resu);
+				}
+			});
 
 		}
 	});
 });
-/***********To group channel vise like jio****************** */
+// /***********To group channel vise like jio****************** */
 app.get("/getChannels", function (req, res) {
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
@@ -382,16 +376,15 @@ app.post("/billing_record", function (req, res) {
 						paydate: new Date(),
 						client_id: req.body.clientId,
 						itemcode: req.body.itemcode,
-					},function(err,rese){
-						if(err)
-						{
+					}, function (err, rese) {
+						if (err) {
 							var failure = {
 								status: "failure",
 								message: "Failed to Add",
 							}
 							res.send(failure);
 						}
-						else{
+						else {
 							console.log("Added");
 							var success = {
 								status: "sucess",
@@ -432,10 +425,10 @@ app.post("/admin/price_table", function (req, res) {
 				releaseYear: req.body.releaseYear,
 				duration: req.body.duration,
 				genre: req.body.genre,
-				comment:"",
+				comment: "",
 				icon: req.body.icon,
-				icon_small:req.body.icon_small,
-				description:req.body.description,
+				icon_small: req.body.icon_small,
+				description: req.body.description,
 				trailerUrl: req.body.trailerUrl,
 			}
 			console.log("created object at price_table");
@@ -460,14 +453,10 @@ app.post("/admin/price_table", function (req, res) {
 	});
 });
 /***********Logout******** */
-app.get("/logout",function(req,res){
-	if(req.session.loggedIn==true)
-	{
-		req.session.loggedIn=false;
-		
-		res.send({status:"success", message:"Succesfully Logged Out"});
-	}
+app.get("/logout", function (req, res) {
+	
 });
 app.listen(3000, function () {
 	console.log("Server started");
 });
+module.exports=app;

@@ -10,6 +10,7 @@
     "client-sessions": "^0.8.0",
     "cors": "^2.8.4",
     "express": "^4.16.2",
+    "express-sessions": "^1.0.6",
     "install": "^0.10.4",
     "jsonwebtoken": "^8.2.0",
     "mongodb": "^3.0.4",
