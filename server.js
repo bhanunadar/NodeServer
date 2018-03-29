@@ -13,6 +13,7 @@ const saltRounds = 10;
 var secret = "wearegoingtowinSIH";
 var cors = require("cors");
 app.use(cors());
+var server_url=" http://fe970ad2.ngrok.io";
 var autoIncrement = require("mongodb-autoincrement");
 app.use(bodyParser.urlencoded({ extended: true }));
 var url = "mongodb://mongo:27017/";
@@ -181,7 +182,7 @@ app.post("/auth", function (req, res) {
 	});
 });
 /*******************wish list ******************/
-app.post("/addToWishList", function (req, res) {
+app.post("/addToWishList",verifyToken, function (req, res,next) {
 	console.log(req);
 	
 	mongoClient.connect(url, function (err, db) {
@@ -244,7 +245,7 @@ app.post("/addToWishList", function (req, res) {
 
 
 /************ To Add Comment************* */
-app.post("/addComment", function (req, res) {
+app.post("/addComment",verifyToken, function (req, res,next) {
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			var failure = {
@@ -306,7 +307,13 @@ app.post("/showDetails",verifyToken, function (req, res,next) {
 				}
 				else {
 					console.log(resu);
+					if(resu!=null){
+					var url=server_url+"/"+resu.icon;
+					var url_sm=server_url+"/"+resu.icon_small;
+					resu.icon=url;
+					resu.icon_small=url_sm;
 					res.send(resu);
+					}
 				}
 			});
 
@@ -314,7 +321,7 @@ app.post("/showDetails",verifyToken, function (req, res,next) {
 	});
 });
 // /***********To group channel vise like jio****************** */
-app.get("/getChannels", function (req, res) {
+app.get("/getChannels",verifyToken, function (req, res,next) {
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			var failure = {
@@ -374,7 +381,7 @@ app.post("/billing_record", function (req, res) {
 						payid: autoIndex,
 						amount: req.body.amount,
 						paydate: new Date(),
-						client_id: req.body.clientId,
+						user_email: req.body.email,
 						itemcode: req.body.itemcode,
 					}, function (err, rese) {
 						if (err) {
