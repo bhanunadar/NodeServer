@@ -457,7 +457,9 @@ app.post("/admin/price_table", function (req, res) {
 							message:"itemcode already used",
 						}
 						res.send(mess);
+						return;
 					}
+					
 					console.log("hello");
 				}
 			});
