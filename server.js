@@ -465,14 +465,20 @@ app.get("/getItems",function(req,res){
 						else{
 							if(resu!=null)
 							{
-								var url=server_url+"/"+resu.icon;
-								var url_sm=server_url+"/"+resu.icon_small;
-								console.log(url+" "+url_sm);
-								resu.icon=url;
-								resu.icon_small=url_sm;
-								console.log(resu);
+								// var url=server_url+"/"+resu.icon;
+								// var url_sm=server_url+"/"+resu.icon_small;
+								// console.log(url+" "+url_sm);
+								// resu.icon=url;
+								// resu.icon_small=url_sm;
+								// console.log(resu);
 								
+
+								for(var i = 0; i < resu.length; i++)	{
+									resu[i].icon = server_url+"/"+resu[i].icon
+									resu[i].icon_small = server_url+"/"+resu[i].icon_small
+								}
 								res.send(resu);
+								
 								return;
 							}
 						}
