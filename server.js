@@ -162,8 +162,9 @@ app.post("/auth", function (req, res) {
 							var token = jwt.sign({ id: req.body.email }, secret, {
 								expiresIn: 86400 // expires in 24 hours
 							  });
+
 						  
-							  res.status(200).send({ status:"success", auth: true, token: token });
+							  res.status(200).send({ status:"success", user:resu, auth: true, token: token });
 							
 						}
 						else {
