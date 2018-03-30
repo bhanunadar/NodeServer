@@ -13,7 +13,7 @@ const saltRounds = 10;
 var secret = "wearegoingtowinSIH";
 var cors = require("cors");
 app.use(cors());
-var server_url=" http://139.59.58.64";
+var server_url=" http://139.59.58.64:8080";
 var autoIncrement = require("mongodb-autoincrement");
 app.use(bodyParser.urlencoded({ extended: true }));
 var url = "mongodb://mongo:27017/";
