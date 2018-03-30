@@ -263,7 +263,7 @@ app.post("/addComment",/*verifyToken,*/ function (req, res,next) {
 			}
 			var dbo = db.db("mydb");
 			var collection = dbo.collection("price_table");
-			collection.update({ itemcode: req.body.itemcode }, { $push: { "comments": { Comment } } }, function (err, req) {
+			collection.update({ itemcode: req.body.itemcode }, { $push: { "comments":  Comment  } }, function (err, req) {
 				if (err) {
 					var failure = {
 						status: "failure",
