@@ -465,7 +465,13 @@ app.get("/getItems",function(req,res){
 						else{
 							if(resu!=null)
 							{
+								var url=server_url+"/"+resu.icon;
+								var url_sm=server_url+"/"+resu.icon_small;
+								console.log(url+" "+url_sm);
+								resu.icon=url;
+								resu.icon_small=url_sm;
 								console.log(resu);
+								
 								res.send(resu);
 								return;
 							}
