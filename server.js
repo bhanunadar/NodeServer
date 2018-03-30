@@ -310,8 +310,10 @@ app.post("/showDetails",verifyToken, function (req, res,next) {
 					if(resu!=null){
 					var url=server_url+"/"+resu.icon;
 					var url_sm=server_url+"/"+resu.icon_small;
+					
 					resu.icon=url;
 					resu.icon_small=url_sm;
+					console.log(resu.icon);
 					res.send(resu);
 					}
 				}
