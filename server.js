@@ -357,6 +357,35 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 		db.close();
 	});
 });
+/********Top 10 recomendation*/
+// app.get("/recomendation",function(req,res){
+// 	mongoClient.connect(url,function(err,db){
+// 		if (err) {
+// 			var failure = {
+// 				status: "failure",
+// 				message: err,
+// 			}
+// 			res.send(failure);
+// 		}
+// 		else {
+// 			var dbo=db.db("mydb");
+// 			var collection=dbo.collection("price_table");
+// 			collection.aggregate([{ "$group":{_id:"$genre"},count:{ $sum: 1 },$sort:{count:-1}},price_table: { $"$$ROOT" }}]).toArray(function(err,resu){
+// 				if(err){
+// 				var failure = {
+// 					status: "failure",
+// 					message: err,
+// 				}
+// 				res.send(failure);
+// 			}
+// 			else{
+// 				res.send(resu);
+// 			}
+// 			});
+
+// 		}
+// 	});
+// })
 /*****************Billing History Of User***************** */
 app.post("/billing_record", function (req, res) {
 	mongoClient.connect(url, function (err, db) {
@@ -408,6 +437,40 @@ app.post("/billing_record", function (req, res) {
 
 		}
 		db.close();
+	});
+});
+app.get("/getItems",function(req,res){
+	mongoClient.connect(url, function (err, db) {
+		if (err) {
+			console.log(err);
+			var failure = {
+				status: "failure",
+				message: err,
+			}
+			res.send(failure);
+		}
+		else {
+				var dbo=db.db("mydb");
+				dbo.collection("price_table").find({}).toArray(function(err,resu){
+						if(err)
+						{
+							console.log(err);
+							var failure = {
+								status: "failure",
+								message: err,
+							}
+							res.send(failure);
+							return;
+						}
+						else{
+							if(resu!=null)
+							{
+								res.send(resu);
+								return;
+							}
+						}
+				});
+		}
 	});
 });
 /******************All Item Details********************** */
