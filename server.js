@@ -465,6 +465,7 @@ app.get("/getItems",function(req,res){
 						else{
 							if(resu!=null)
 							{
+								console.log(resu);
 								res.send(resu);
 								return;
 							}
