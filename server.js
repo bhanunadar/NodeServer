@@ -245,7 +245,7 @@ app.post("/addToWishList",verifyToken, function (req, res,next) {
 
 
 /************ To Add Comment************* */
-app.post("/addComment",verifyToken, function (req, res,next) {
+app.post("/addComment",/*verifyToken,*/ function (req, res,next) {
 	mongoClient.connect(url, function (err, db) {
 		if (err) {
 			var failure = {
@@ -297,7 +297,7 @@ app.post("/showDetails",verifyToken, function (req, res,next) {
 			var id = req.body.itemcode;
 			console.log(id);
 			var dbo = db.db("mydb");
-			dbo.collection("price_table").findOne({ itemcode: id }, function (err, resu) {
+			dbo.collection("price_table").findOne({ itemcode:req.body.itemcode }, function (err, resu) {
 				if (err) {
 					var failure = {
 						status: "failure",
@@ -313,7 +313,7 @@ app.post("/showDetails",verifyToken, function (req, res,next) {
 					
 					resu.icon=url;
 					resu.icon_small=url_sm;
-					console.log(resu.icon);
+					console.log(resu);
 					res.send(resu);
 					}
 				}
