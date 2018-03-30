@@ -439,7 +439,7 @@ app.post("/admin/price_table", function (req, res) {
 				trailerUrl: req.body.trailerUrl,
 			}
 			
-			dbo.collection("price_table").findOne({itemcode:req.body.itemcode},function(req,result){
+			dbo.collection("price_table").findOne({itemcode:req.body.itemcode},function(err,result){
 				if(err)
 				{
 					var failure = {
@@ -450,13 +450,15 @@ app.post("/admin/price_table", function (req, res) {
 				}
 				else
 				{
-					if(result==null)
+					console.log(result);
+					if(result!=null)
 					{
 						var mess={
 							message:"itemcode already used",
 						}
 						res.send(mess);
 					}
+					console.log("hello");
 				}
 			});
 			console.log("created object at price_table");
