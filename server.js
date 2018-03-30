@@ -263,7 +263,7 @@ app.post("/addComment",/*verifyToken,*/ function (req, res,next) {
 			}
 			var dbo = db.db("mydb");
 			var collection = dbo.collection("price_table");
-			collection.update({ itemcode: req.body.itemcode }, { $push: {  Comment } } , function (err, req) {
+			collection.update({ itemcode: req.body.itemcode }, { $push: { "comments": { Comment } } }, function (err, req) {
 				if (err) {
 					var failure = {
 						status: "failure",
@@ -434,7 +434,7 @@ app.post("/admin/price_table", function (req, res) {
 				releaseYear: req.body.releaseYear,
 				duration: req.body.duration,
 				genre: req.body.genre,
-				comments: "",
+				comment: "",
 				icon: req.body.icon,
 				icon_small: req.body.icon_small,
 				description: req.body.description,
