@@ -583,7 +583,6 @@ app.post("/billing_record", function (req, res) {
 				}
 				else {
 					var collection = dbo.collection("billing_record");
-					var collection2=dbo.collection("price_table");
 					collection.insert({
 						payid: autoIndex,
 						amount: req.body.amount,
@@ -602,42 +601,19 @@ app.post("/billing_record", function (req, res) {
 							return;
 						}
 						else {
-							var collection=dbo.collection("user_credentials");
-							collection.findOne({email:req.body.email},function(err,resu){
-								console.log(resu.credentials);
-								var credent=parseInt(resu.credentials);
-								console.log(credent);
-								console.log(credent-parseInt(req.body.amount))
-								collection.updateOne({email:req.body.email},{$set:{credentials:(credent-parseInt(req.body.amount))}},function(err,resu){
-									if (err) {
-										var failure = {
-											status: "failure",
-											message: err,
-										}
-										res.send(failure);
-										return;
-									}
-									else
-									{
-
-										var success = {
-											status: "success",
-											message: "Succesfully Added to Database"
-											}
-										res.send(success);
-										return;
-									}
-								});
-							})
-							
-						}
-					});
-				}
+								var success = {
+									status: "success",
+									message: "Succesfully Added to Database"
+								}
+									res.send(success);
+									return;
+								}
+						});
+					}
+				
 			});
-
 		}
-		
-	});
+		});
 });
 app.post("/admin/creatingBank",function(req,res){
 	mongoClient.connect(url,function(err,db){
@@ -734,6 +710,7 @@ app.post("/admin/price_table", function (req, res) {
 		else {
 			var dbo = db.db("mydb");
 			var object = {
+				hours_view:req.body.hours_view,
 				itemcode: req.body.itemcode,
 				title: req.body.title,
 				cost: req.body.cost,
