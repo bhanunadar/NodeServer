@@ -530,7 +530,7 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 	});
 });
 /********Top 10 recomendation*/
- app.post("/recomendation",function(req,res){
+ app.post("/recommendation",function(req,res){
 	mongoClient.connect(url,function(err,db){
 		if (err) {
 			var failure = {
@@ -587,6 +587,7 @@ app.post("/billing_record", function (req, res) {
 					collection.insert({
 						payid: autoIndex,
 						amount: req.body.amount,
+						genre:req.body.genre,
 						paydate: new Date(),
 						user_email: req.body.email,
 						itemcode: req.body.itemcode,
