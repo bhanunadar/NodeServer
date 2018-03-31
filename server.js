@@ -264,6 +264,47 @@ app.post("/addComment",/*verifyToken,*/ function (req, res,next) {
 			}
 			var dbo = db.db("mydb");
 			var collection = dbo.collection("price_table");
+			collection.findOne({itemcode:req.body.itemcode},function(err,resu){
+				if (err) {
+					var failure = {
+						status: "failure",
+						message: err,
+					}
+					res.send(failure);
+				}
+				else
+				{
+					console.log(resu);
+					console.log(resu.rating);
+					var rate=parseFloat(resu.rating);
+					console.log("resu"+resu.comments.length);
+					var ans=rate*1.0*(resu.comments.length)+parseFloat(req.body.rating);
+					console.log(ans);
+					if(resu.comments.length!=0)
+					var new_rate=ans*1.0/(resu.comments.length+1);
+					else{
+					new_rate=req.body.rating;
+					console.log();
+					}
+					
+					collection.update({itemcode:req.body.itemcode},{$set:{rating:new_rate.toString()}},function(err,resu){
+						if (err) {
+							var failure = {
+								status: "failure",
+								message: err,
+							}
+							res.send(failure);
+						}
+						else
+						{
+							
+
+						}
+					});
+
+				}
+
+			});
 			collection.update({ itemcode: req.body.itemcode }, { $push: { "comments":  Comment  } }, function (err, req) {
 				if (err) {
 					var failure = {
