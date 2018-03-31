@@ -325,7 +325,7 @@ app.post("/addComment",/*verifyToken,*/ function (req, res,next) {
 	});
 });
 /***********************to Show The Full Detail of one item********** */
-app.post("/showDetails",verifyToken, function (req, res,next) {
+app.post("/showDetails"/*,verifyToken*/, function (req, res,next) {
 	console.log(req.itemcode);
 	  mongoClient.connect(url, function (err, db) {
 		if (err) {
@@ -479,6 +479,9 @@ app.post("/billing_record", function (req, res) {
 		}
 		db.close();
 	});
+});
+app.post("/creatingBank",function(req,res){
+
 });
 app.get("/getItems",function(req,res){
 	mongoClient.connect(url, function (err, db) {
