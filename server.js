@@ -253,27 +253,28 @@ app.get("/subscribedChannels"/*,verifyToken*/,function(req,res){
 				status:"failure",
 				message:err,
 			}
-			res.send(failure)
+			res.send(failure);
 			return;
 		}
 		else
 		{
 			var dbo=db.db("mydb");
 			var collection=dbo.collection("billing_record");
-			collection.find({email:uemail}).sort({channel_id:1}).toArray(function(err,resu){
+			collection.find({user_email:uemail}).sort({channel_id:1}).toArray(function(err,resu){
 				if(err)
 				{
 					var failure={
 						status:"failure",
 						message:err,
 					}
-					res.send(failure)
+					res.send(failure);
 					return;
 				}
 				else
 				{
 					var j=0,k=0;
 					var string="";
+					console.log(resu);
 					while(j<resu.length)
 					{
 						if(resu[j].channel_id==k)
@@ -294,7 +295,15 @@ app.get("/subscribedChannels"/*,verifyToken*/,function(req,res){
 						}
 						
 					}
-					res.send(string);
+					for(var d=k;k<100;k++)
+					string=string+"0";
+
+					var s;
+					var p={
+						s:string,
+					}
+					console.log(p);
+					res.send(p);
 					return;
 				}
 			});
