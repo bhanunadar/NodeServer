@@ -244,7 +244,63 @@ app.post("/addToWishList",verifyToken, function (req, res,next) {
 	});
 });
 
-
+app.get("/subscribedChannels"/*,verifyToken*/,function(req,res){
+	var uemail="bhanu.nadar@gmail.com";
+	mongoClient.connect(url,function(err,db){
+		if(err)
+		{
+			var failure={
+				status:"failure",
+				message:err,
+			}
+			res.send(failure)
+			return;
+		}
+		else
+		{
+			var dbo=db.db("mydb");
+			var collection=dbo.collection("billing_record");
+			collection.find({email:uemail}).sort({channel_id:1}).toArray(function(err,resu){
+				if(err)
+				{
+					var failure={
+						status:"failure",
+						message:err,
+					}
+					res.send(failure)
+					return;
+				}
+				else
+				{
+					var j=0,k=0;
+					var string="";
+					while(j<resu.length)
+					{
+						if(resu[j].channel_id==k)
+						{
+							j++;
+							k++;
+							string=string+"1";
+						}
+						else if(resu[j].amount==0)
+						{
+							j++;
+							k++;
+							string=string+"1";
+						}
+						else{
+						k++;
+						string=string+"0";
+						}
+						
+					}
+					res.send(string);
+					return;
+				}
+			});
+		}
+	})
+})
 /************ To Add Comment************* */
 app.post("/addComment",/*verifyToken,*/ function (req, res,next) {
 	mongoClient.connect(url, function (err, db) {
@@ -444,7 +500,7 @@ app.post("/billing_record", function (req, res) {
 				if (err) {
 					var failure = {
 						status: "failure",
-						message: "Failed to Add",
+						message: err,
 					}
 					res.send(failure);
 				}
@@ -456,13 +512,15 @@ app.post("/billing_record", function (req, res) {
 						paydate: new Date(),
 						user_email: req.body.email,
 						itemcode: req.body.itemcode,
+						channel_id:req.body.channel_id,
 					}, function (err, rese) {
 						if (err) {
 							var failure = {
 								status: "failure",
-								message: "Failed to Add",
+								message: err,
 							}
 							res.send(failure);
+							return;
 						}
 						else {
 							console.log("Added");
@@ -477,7 +535,7 @@ app.post("/billing_record", function (req, res) {
 			});
 
 		}
-		db.close();
+		
 	});
 });
 app.post("/creatingBank",function(req,res){
