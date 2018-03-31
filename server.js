@@ -553,7 +553,7 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 				return;
 			}
 			else{
-				res.send(resu);
+				res.send(resu.genre);
 			}
 			});
 
@@ -561,29 +561,39 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 	});
  });
 /*****************Billing History Of User***************** */
-app.post("/billing_record", function (req, res) {
-	mongoClient.connect(url, function (err, db) {
-		if (err) {
-			var failure = {
+app.post("/billing_record", function (req, res) 
+{
+	mongoClient.connect(url, function (err, db) 
+	{
+		if (err) 
+		{
+			var failure = 
+			{
 				status: "failure",
 				message: err,
 			}
 			res.send(failure);
 		}
-		else {
+		else 
+		{
 			console.log("Connection established");
 			var dbo = db.db("mydb");
-			autoIncrement.getNextSequence(dbo, "billing_record", function (err, autoIndex) {
-				if (err) {
-					var failure = {
+			autoIncrement.getNextSequence(dbo, "billing_record", function (err, autoIndex)
+			{
+				if (err) 
+				{
+					var failure = 
+					{
 						status: "failure",
 						message: err,
 					}
 					res.send(failure);
 				}
-				else {
+				else 
+				{
 					var collection = dbo.collection("billing_record");
-					collection.insert({
+					collection.insert(
+						{
 						payid: autoIndex,
 						amount: req.body.amount,
 						genre:req.body.genre,
@@ -591,29 +601,33 @@ app.post("/billing_record", function (req, res) {
 						user_email: req.body.email,
 						itemcode: req.body.itemcode,
 						channel_id:req.body.channel_id,
-					}, function (err, rese) {
-						if (err) {
-							var failure = {
+						}, function (err, rese) 
+						{
+						if (err) 
+						{
+							var failure = 
+							{
 								status: "failure",
 								message: err,
 							}
 							res.send(failure);
 							return;
 						}
-						else {
-								var success = {
+						else 
+						{
+								var success = 
+								{
 									status: "success",
 									message: "Succesfully Added to Database"
 								}
 									res.send(success);
 									return;
-								}
+						}
 						});
-					}
-				
+				}
 			});
 		}
-		});
+	});
 });
 app.post("/admin/creatingBank",function(req,res){
 	mongoClient.connect(url,function(err,db){
