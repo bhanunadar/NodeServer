@@ -18,7 +18,7 @@ var autoIncrement = require("mongodb-autoincrement");
 app.use(bodyParser.urlencoded({ extended: true }));
 var url = "mongodb://mongo:27017/";
 app.use(express.static("resources"));
-
+var global_address;
 var mongoClient = mongodb.MongoClient;
 app.use(function (req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
@@ -110,7 +110,73 @@ app.post("/signup", function (req, res) {
 	});
 
 });
-
+app.post("/get",function(req,res){
+	mongoClient.connect(url,function(err,db){
+		if (err) {
+			console.log("Unable to connect", err);
+			console.log("failure");
+			var failure = {
+				status: "failure",
+				message: err,
+			}
+			res.send(failure);
+		}
+		else {
+			var dbo=db.db("mydb");
+			var collection=dbo.collection("address");
+			collection.findOne({path:req.body.path},function(err,resu){
+				if (err) {
+					console.log("Unable to connect", err);
+					console.log("failure");
+					var failure = {
+						status: "failure",
+						message: err,
+					}
+					res.send(failure);
+				}
+				else {
+					res.send(resu);
+				}
+			});;
+		}
+	});
+})
+app.post("/put",function(req,res){
+	mongoClient.connect(url,function(err,db){
+		if (err) {
+			console.log("Unable to connect", err);
+			console.log("failure");
+			var failure = {
+				status: "failure",
+				message: err,
+			}
+			res.send(failure);
+		}
+		else {
+			var dbo=db.db("mydb");
+			global_address=req.body.path;
+			var collection=dbo.collection("address");
+			collection.insert({path:req.body.path},function(err,resu){
+				if (err) {
+					console.log("Unable to connect", err);
+					console.log("failure");
+					var failure = {
+						status: "failure",
+						message: err,
+					}
+					res.send(failure);
+				}
+				else {
+					var success = {
+						status: "success",
+						message: "Succesfully Loged In"
+					}
+					console.log("succes");
+				}
+			});
+		}
+	});
+});
 /**************Authentication***************/
 app.post("/auth", function (req, res) {
 
@@ -295,7 +361,7 @@ app.get("/subscribedChannels"/*,verifyToken*/,function(req,res){
 						}
 						
 					}
-					for(var d=k;k<100;k++)
+					for(var d=k;k<60;k++)
 					string=string+"0";
 
 					var s;
@@ -532,12 +598,34 @@ app.post("/billing_record", function (req, res) {
 							return;
 						}
 						else {
-							console.log("Added");
-							var success = {
-								status: "sucess",
-								message: "Succesfully Added to Database"
-							}
-							res.send(success);
+							var collection=dbo.collection("user_credentials");
+							collection.findOne({email:req.body.email},function(err,resu){
+								console.log(resu.credentials);
+								var credent=parseInt(resu.credentials);
+								console.log(credent);
+								console.log(credent-parseInt(req.body.amount))
+								collection.updateOne({email:req.body.email},{$set:{credentials:(credent-parseInt(req.body.amount))}},function(err,resu){
+									if (err) {
+										var failure = {
+											status: "failure",
+											message: err,
+										}
+										res.send(failure);
+										return;
+									}
+									else
+									{
+
+										var success = {
+											status: "success",
+											message: "Succesfully Added to Database"
+											}
+										res.send(success);
+										return;
+									}
+								});
+							})
+							
 						}
 					});
 				}
@@ -547,8 +635,38 @@ app.post("/billing_record", function (req, res) {
 		
 	});
 });
-app.post("/creatingBank",function(req,res){
-
+app.post("/admin/creatingBank",function(req,res){
+	mongoClient.connect(url,function(err,db){
+		if (err) {
+			console.log(err);
+			var failure = {
+				status: "failure",
+				message: err,
+			}
+			res.send(failure);
+		}
+		else
+		{
+			var dbo=db.db("mydb");
+			dbo.collection("user_credentials").insertOne({email:req.body.email,credentials:parseInt(100)},function(err,resu){
+				
+				if(err){var failure = {
+					status: "failure",
+					message: err,
+				}
+				res.send(failure);
+				}
+				else
+				{
+					var success = {
+						status: "success",
+						message: "Succesfully Added to Database"
+					}
+					res.send(success);
+				}
+			})
+		}
+	})
 });
 app.get("/getItems",function(req,res){
 	mongoClient.connect(url, function (err, db) {
