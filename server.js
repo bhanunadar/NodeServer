@@ -553,42 +553,31 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 				return;
 			}
 			else{
-				console.log(resu);
+				console.log(resu[0].genre);
+				console.log({genre:resu[0].genre});
 				
-				res.send({genre:resu[0].genre});
+				var dbo=db.db("mydb");
+				var collection=dbo.collection("price_table");
+				collection.find({genre:"Sports"}).toArray(function(err,resu){
+					if(err){
+						var failure = {
+							status: "failure",
+							message: err,
+						}
+						res.send(failure);
+						return;
+					}
+					else{
+						res.send(resu);
+					}
+				});
 			}
 			});
 
 		}
 	});
  });
- app.post("/genre",function(req,res){
-	if(err){
-		var failure = {
-			status: "failure",
-			message: err,
-		}
-		res.send(failure);
-		return;
-	}
-	else{
-		var dbo=db.db("mydb");
-		var collection=dbo.collection("price_table");
-		collection.find({genre:"req.body.genre"}).toArray(function(req,resu){
-			if(err){
-				var failure = {
-					status: "failure",
-					message: err,
-				}
-				res.send(failure);
-				return;
-			}
-			else{
-				res.send(resu);
-			}
-		});
-	}
- });
+
 /*****************Billing History Of User***************** */
 app.post("/billing_record", function (req, res) 
 {
