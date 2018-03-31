@@ -530,7 +530,7 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 	});
 });
 /********Top 10 recomendation*/
-// app.get("/recomendation",function(req,res){
+//  app.get("/recomendation",function(req,res){
 // 	mongoClient.connect(url,function(err,db){
 // 		if (err) {
 // 			var failure = {
@@ -542,7 +542,7 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 // 		else {
 // 			var dbo=db.db("mydb");
 // 			var collection=dbo.collection("price_table");
-// 			collection.aggregate([{ "$group":{_id:"$genre"},count:{ $sum: 1 },$sort:{count:-1}},price_table: { $"$$ROOT" }}]).toArray(function(err,resu){
+// 			collection.aggregate([{ "$group":{_id:"$genre"}.toArray(function(err,resu){
 // 				if(err){
 // 				var failure = {
 // 					status: "failure",
@@ -557,7 +557,7 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 
 // 		}
 // 	});
-// })
+//  })
 /*****************Billing History Of User***************** */
 app.post("/billing_record", function (req, res) {
 	mongoClient.connect(url, function (err, db) {
@@ -581,6 +581,7 @@ app.post("/billing_record", function (req, res) {
 				}
 				else {
 					var collection = dbo.collection("billing_record");
+					var collection2=dbo.collection("price_table");
 					collection.insert({
 						payid: autoIndex,
 						amount: req.body.amount,
@@ -725,6 +726,7 @@ app.post("/admin/price_table", function (req, res) {
 				message: err,
 			}
 			res.send(failure);
+			return;
 		}
 		else {
 			var dbo = db.db("mydb");
@@ -754,6 +756,7 @@ app.post("/admin/price_table", function (req, res) {
 						message: err,
 					}
 					res.send(failure);
+					return;
 				}
 				else
 				{
@@ -778,6 +781,7 @@ app.post("/admin/price_table", function (req, res) {
 						message: err,
 					}
 					res.send(failure);
+					return;
 				}
 				else {
 					var success = {
@@ -785,6 +789,7 @@ app.post("/admin/price_table", function (req, res) {
 						message: "Succesfully Added to Database"
 					}
 					res.send(success);
+					return;
 				}
 			});
 		}
