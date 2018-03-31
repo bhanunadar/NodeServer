@@ -530,34 +530,36 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 	});
 });
 /********Top 10 recomendation*/
-//  app.get("/recomendation",function(req,res){
-// 	mongoClient.connect(url,function(err,db){
-// 		if (err) {
-// 			var failure = {
-// 				status: "failure",
-// 				message: err,
-// 			}
-// 			res.send(failure);
-// 		}
-// 		else {
-// 			var dbo=db.db("mydb");
-// 			var collection=dbo.collection("price_table");
-// 			collection.aggregate([{ "$group":{_id:"$genre"}.toArray(function(err,resu){
-// 				if(err){
-// 				var failure = {
-// 					status: "failure",
-// 					message: err,
-// 				}
-// 				res.send(failure);
-// 			}
-// 			else{
-// 				res.send(resu);
-// 			}
-// 			});
+ app.post("/recomendation",function(req,res){
+	mongoClient.connect(url,function(err,db){
+		if (err) {
+			var failure = {
+				status: "failure",
+				message: err,
+			}
+			res.send(failure);
+		}
+		else {
+			var dbo=db.db("mydb");
+			var collection=dbo.collection("billing_record");
+			
+			collection.find({user_email:req.body.email},[{ "$group": { _id:"$genre" ,count:{$sum:1}}},{$sort:{"count":-1},}]).limit(1).toArray(function(err,resu){
+				if(err){
+				var failure = {
+					status: "failure",
+					message: err,
+				}
+				res.send(failure);
+				return;
+			}
+			else{
+				res.send(resu);
+			}
+			});
 
-// 		}
-// 	});
-//  })
+		}
+	});
+ });
 /*****************Billing History Of User***************** */
 app.post("/billing_record", function (req, res) {
 	mongoClient.connect(url, function (err, db) {
