@@ -554,12 +554,40 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 			}
 			else{
 				console.log(resu);
-				res.send(resu[0].genre);
+				
+				res.send({genre:resu[0].genre});
 			}
 			});
 
 		}
 	});
+ });
+ app.post("/genre",function(req,res){
+	if(err){
+		var failure = {
+			status: "failure",
+			message: err,
+		}
+		res.send(failure);
+		return;
+	}
+	else{
+		var dbo=db.db("mydb");
+		var collection=dbo.collection("price_table");
+		collection.find({genre:"req.body.genre"}).toArray(function(req,resu){
+			if(err){
+				var failure = {
+					status: "failure",
+					message: err,
+				}
+				res.send(failure);
+				return;
+			}
+			else{
+				res.send(resu);
+			}
+		});
+	}
  });
 /*****************Billing History Of User***************** */
 app.post("/billing_record", function (req, res) 
