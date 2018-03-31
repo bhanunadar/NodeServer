@@ -553,7 +553,8 @@ app.get("/getChannels",verifyToken, function (req, res,next) {
 				return;
 			}
 			else{
-				res.send(resu.genre);
+				console.log(resu);
+				res.send(resu[0].genre);
 			}
 			});
 
